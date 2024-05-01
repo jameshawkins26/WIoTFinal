@@ -36,14 +36,12 @@
 #include <zephyr/sys/printk.h>
 #include <inttypes.h>
 
-#define MAX_REC_COUNT		3
-#define NDEF_MSG_BUF_SIZE	128
+#define MAX_REC_COUNT       3
+#define NDEF_MSG_BUF_SIZE   128
 
-#define NFC_FIELD_LED		DK_LED1
+#define NFC_FIELD_LED       DK_LED1
 
 #define LAB2_SERVICE_UUID BT_UUID_128_ENCODE(0x5253FF4B, 0xE47C, 0x4EC8, 0x9792, 0x69FDF4923B4A)
-
-static ssize_t characteristic_read(struct bt_conn *conn, const struct bt_gatt_attr *attr, void *buf, uint16_t len, uint16_t offset);
 
 uint32_t characteristic_value = 0x0;
 
@@ -60,87 +58,76 @@ static const uint8_t en_code[] = {'e', 'n'};
 /* Buffer used to hold an NFC NDEF message. */
 static uint8_t ndef_msg_buf[NDEF_MSG_BUF_SIZE];
 
-static const struct bt_data ad[] = {
-	BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
-	BT_DATA_BYTES(BT_DATA_UUID128_ALL, NEW_SERVICE_UUID)
-};
 
+int randomNumber;
 
-
-// Setup the the service and characteristics.
 BT_GATT_SERVICE_DEFINE(lab2_service,
-	BT_GATT_PRIMARY_SERVICE(
-		BT_UUID_DECLARE_128(LAB2_SERVICE_UUID)
-	),
-	BT_GATT_CHARACTERISTIC(BT_UUID_DECLARE_16(0x000a), BT_GATT_CHRC_READ,
-			       BT_GATT_PERM_READ, characteristic_read, NULL, &characteristic_value),
-);
+    BT_GATT_PRIMARY_SERVICE(
+        BT_UUID_DECLARE_128(NEW_SERVICE_UUID)
+    ));
 
 // Setup callbacks when devices connect and disconnect.
 static void connected(struct bt_conn *conn, uint8_t err)
 {
-	if (err) {
-		printk("Connection failed (err 0x%02x)\n", err);
-	} else {
-		printk("Connected\n");
-	}
+    if (err) {
+        printk("Connection failed (err 0x%02x)\n", err);
+    } else {
+        printk("Connected\n");
+    }
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
 {
-	printk("Disconnected (reason 0x%02x)\n", reason);
+    printk("Disconnected (reason 0x%02x)\n", reason);
 }
 
 BT_CONN_CB_DEFINE(conn_callbacks) = {
-	.connected = connected,
-	.disconnected = disconnected,
+    .connected = connected,
+    .disconnected = disconnected,
 };
 
-
+static struct bt_data ad[2]; 
 static void bt_ready(int err)
 {
-	if (err) {
-		printk("Bluetooth init failed (err %d)\n", err);
-		return;
-	}
+    if (err) {
+        printk("Bluetooth init failed (err %d)\n", err);
+        return;
+    }
 
-	printk("Bluetooth initialized\n");
+    printk("Bluetooth initialized\n");
 
-	err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), NULL, 0);
-	if (err) {
-		printk("Advertising failed to start (err %d)\n", err);
-		return;
-	}
+    // Convert the random number to a string
+    char random_str[5]; // Assuming the random number is within 99999
+    snprintf(random_str, sizeof(random_str), "%d", randomNumber);
 
-	printk("Advertising successfully started\n");
-}
+    // Explicitly set advertisement data elements
+    ad[0] = (struct bt_data)BT_DATA(BT_DATA_NAME_COMPLETE, random_str, strlen(random_str));
+    ad[1] = (struct bt_data)BT_DATA_BYTES(BT_DATA_UUID128_ALL, NEW_SERVICE_UUID);
 
-static ssize_t characteristic_read(struct bt_conn *conn,
-			                       const struct bt_gatt_attr *attr,
-								   void *buf,
-			                       uint16_t len,
-								   uint16_t offset)
-{
-	// The `user_data` corresponds to the pointer provided as the last "argument"
-	// to the `BT_GATT_CHARACTERISTIC` macro.
-	uint32_t *value = attr->user_data;
+    err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), NULL, 0);
+    if (err) {
+        printk("Advertising failed to start (err %d)\n", err);
+        return;
+    }
 
-	// Need to encode data into a buffer to send to client.
-	uint8_t out_buffer[4] = {0};
+    printk("Advertising successfully started\n");
 
-	out_buffer[0]=0xc5;
-	out_buffer[1]=0xec;
-	out_buffer[2]=0x45;
-	out_buffer[3]=0x01;
-
-	// User helper function to encode the output data to send to
-	// the client.
-	return bt_gatt_attr_read(conn, attr, buf, len, offset, out_buffer, 4);
+    // for (size_t i = 0; i < ARRAY_SIZE(ad); i++) {
+    //     switch (ad[i].type) {
+    //         case BT_DATA_NAME_SHORTENED:
+    //             printk("Number (shortened): %.*s\n", ad[i].data_len, ad[i].data);
+    //             break;
+    //         case BT_DATA_NAME_COMPLETE:
+    //             printk("Number (complete): %.*s\n", ad[i].data_len, ad[i].data);
+    //             printk(ad[i].data);
+    //             break;
+    //     }
+    // }
 }
 
 /* Function to generate a random number */
 static int generateRandomNumber() {
-    return rand() % 10001;
+    return rand() % 1000001;
 }
 
 /* Function to encode the NDEF text message */
@@ -225,15 +212,15 @@ int main(void)
     srand(k_cycle_get_32());
 
     /* Generate random number */
-    int randomNumber = generateRandomNumber();
+    randomNumber = generateRandomNumber();
 
-	int err;
+    int err;
 
-	err = bt_enable(bt_ready);
-	if (err) {
-		printk("Bluetooth init failed (err %d)\n", err);
-		return;
-	}
+    err = bt_enable(bt_ready);
+    if (err) {
+        printk("Bluetooth init failed (err %d)\n", err);
+        return;
+    }
 
     /* Encode welcome message with the generated random number */
     if (welcome_msg_encode(ndef_msg_buf, &len, randomNumber) < 0) {
@@ -263,3 +250,5 @@ fail:
 
     return -EIO;
 }
+
+
