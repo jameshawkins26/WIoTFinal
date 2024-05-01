@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "uuid.h": "c",
+        "conn.h": "c"
+    }
+}
