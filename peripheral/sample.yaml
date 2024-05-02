@@ -1,8 +1,8 @@
 sample:
-  description: NFC Records text sample
-  name: NFC Records text
+  description: NFC Writable NDEF Message sample
+  name: NFC Writable NDEF Message
 tests:
-  sample.nfc.record_text:
+  sample.nfc.writable_ndef_msg:
     build_only: true
     integration_platforms:
       - nrf52840dk_nrf52840

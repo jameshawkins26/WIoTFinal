@@ -1,13 +1,13 @@
-.. _record_text:
+.. _writable_ndef_msg:
 
-NFC: Text record
-################
+NFC: Writable NDEF message
+##########################
 
 .. contents::
    :local:
    :depth: 2
 
-The NFC Text record sample shows how to use the NFC tag to expose a text record to NFC polling devices.
+The Writable NDEF message sample shows how to use the NFC tag to expose an NDEF message that can be overwritten with any other NDEF message by an NFC device.
 It uses the :ref:`lib_nfc_ndef`.
 
 Requirements
@@ -19,26 +19,36 @@ The sample supports the following development kits:
 
 .. include:: /includes/tfm.txt
 
-The sample also requires a smartphone or tablet.
+The sample also requires a smartphone or tablet with NFC Tools application (or equivalent).
 
 Overview
 ********
 
-When the sample starts, it initializes the NFC tag and generates an NDEF message with three text records that contain the text "Hello World!" in three languages.
-Then it sets up the NFC library to use the generated message and sense the external NFC field.
+When the sample starts, it initializes the NFC tag and loads the NDEF message from the file in flash memory.
+If the NDEF message file does not exist, a default message is generated.
+It is a URI message with a URI record containing the URL "nordicsemi.com".
+The sample then sets up the NFC library for the Type 4 Tag platform, which uses the NDEF message and senses the external NFC field.
 
-The only events handled by the application are the NFC events.
+The library works in Read-Write emulation mode.
+In this mode, procedures for reading and updating an NDEF message are handled internally by the NFC library.
+Any changes to the NDEF message update the NDEF message file stored in flash memory.
 
 User interface
 **************
 
 LED 1:
    Indicates if an NFC field is present.
+LED 2:
+   Indicates that the NDEF message was updated.
+LED 4:
+   Indicates that the NDEF message was read.
+
+Button 1:
+   Press during startup to restore the default NDEF message.
 
 Building and running
 ********************
-
-.. |sample path| replace:: :file:`samples/nfc/record_text`
+.. |sample path| replace:: :file:`samples/nfc/writable_ndef_msg`
 
 .. include:: /includes/build_and_run_ns.txt
 
@@ -50,27 +60,30 @@ Testing
 
 After programming the sample to your development kit, complete the following steps to test it:
 
-1. Touch the NFC antenna with the smartphone or tablet and observe that **LED 1** is lit.
-#. Observe that the smartphone or tablet displays the encoded text (in the most suitable language).
-#. Move the smartphone or tablet away from the NFC antenna and observe that **LED 1** turns off.
+1. Touch the NFC antenna with the smartphone or tablet and observe that **LED 1** and **LED 4** are lit.
+#. Observe that the smartphone or tablet tries to open the URL "http\://www.nordicsemi.com" in a web browser.
+#. Use a proper application (for example, NFC Tools for Android) to overwrite the existing NDEF message with your own message.
+#. Restart your development kit and touch the antenna again.
+   Observe that the new message is displayed.
 
 Dependencies
 ************
 
 This sample uses the following |NCS| libraries:
 
-* :ref:`nfc_ndef_msg`
-* :ref:`nfc_text`
+* :ref:`nfc_uri`
+* :ref:`nfc_t4t_ndef_file_readme`
 
-In addition, it uses the Type 2 Tag library from `sdk-nrfxlib`_:
+In addition, it uses the Type 4 Tag library from `sdk-nrfxlib`_:
 
-* :ref:`nrfxlib:nfc_api_type2`
+* :ref:`nrfxlib:nfc_api_type4`
 
 It uses the following Zephyr libraries:
 
+* ``include/atomic.h``
 * ``include/zephyr.h``
 * ``include/device.h``
-* ``include/power/reboot.h``
+* ``include/nvs/nvs.h``
 * :ref:`GPIO Interface <zephyr:api_peripherals>`
 
 The sample also uses the following secure firmware component:

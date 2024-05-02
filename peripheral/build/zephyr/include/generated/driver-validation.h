@@ -6,6 +6,8 @@
                 
 #define Z_SYSCALL_DRIVER_ENTROPY(ptr, op) Z_SYSCALL_DRIVER_GEN(ptr, op, entropy, ENTROPY)
 
+#define Z_SYSCALL_DRIVER_FLASH(ptr, op) Z_SYSCALL_DRIVER_GEN(ptr, op, flash, FLASH)
+
 #define Z_SYSCALL_DRIVER_GPIO(ptr, op) Z_SYSCALL_DRIVER_GEN(ptr, op, gpio, GPIO)
 
 #define Z_SYSCALL_DRIVER_UART(ptr, op) Z_SYSCALL_DRIVER_GEN(ptr, op, uart, UART)
@@ -41,8 +43,6 @@
 #define Z_SYSCALL_DRIVER_ESPI(ptr, op) Z_SYSCALL_DRIVER_GEN(ptr, op, espi, ESPI)
 
 #define Z_SYSCALL_DRIVER_ESPI_SAF(ptr, op) Z_SYSCALL_DRIVER_GEN(ptr, op, espi_saf, ESPI_SAF)
-
-#define Z_SYSCALL_DRIVER_FLASH(ptr, op) Z_SYSCALL_DRIVER_GEN(ptr, op, flash, FLASH)
 
 #define Z_SYSCALL_DRIVER_FPGA(ptr, op) Z_SYSCALL_DRIVER_GEN(ptr, op, fpga, FPGA)
 

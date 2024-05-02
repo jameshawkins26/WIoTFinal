@@ -39,6 +39,11 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/alexismann/Desktop/iot/cli_1/record_text_1/build/modules/nrf/drivers/mpsl/clock_control/cmake_install.cmake")
+  include("/Users/alexismann/Desktop/iot/cli_1/writable_ndef_msg_2/build/modules/nrf/drivers/mpsl/clock_control/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/Users/alexismann/Desktop/iot/cli_1/writable_ndef_msg_2/build/modules/nrf/drivers/mpsl/flash_sync/cmake_install.cmake")
 endif()
 

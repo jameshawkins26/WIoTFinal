@@ -1,7 +1,7 @@
-/Users/alexismann/Desktop/iot/cli_1/record_text_1/build/Kconfig/Kconfig.dts
-/Users/alexismann/Desktop/iot/cli_1/record_text_1/build/Kconfig/Kconfig.modules
-/Users/alexismann/Desktop/iot/cli_1/record_text_1/build/Kconfig/Kconfig.shield
-/Users/alexismann/Desktop/iot/cli_1/record_text_1/build/Kconfig/Kconfig.shield.defconfig
+/Users/alexismann/Desktop/iot/cli_1/writable_ndef_msg_2/build/Kconfig/Kconfig.dts
+/Users/alexismann/Desktop/iot/cli_1/writable_ndef_msg_2/build/Kconfig/Kconfig.modules
+/Users/alexismann/Desktop/iot/cli_1/writable_ndef_msg_2/build/Kconfig/Kconfig.shield
+/Users/alexismann/Desktop/iot/cli_1/writable_ndef_msg_2/build/Kconfig/Kconfig.shield.defconfig
 /opt/nordic/ncs/toolchains/20d68df7e5/opt/zephyr-sdk/cmake/zephyr/Kconfig
 /opt/nordic/ncs/v2.5.1/modules/debug/TraceRecorder/config/Kconfig
 /opt/nordic/ncs/v2.5.1/modules/debug/TraceRecorder/kernelports/Zephyr/Kconfig
