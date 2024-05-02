@@ -80,8 +80,6 @@
 
 #define LAB2_SERVICE_UUID BT_UUID_128_ENCODE(0x5253FF4B, 0xE47C, 0x4EC8, 0x9792, 0x69FDF4923B4A)
 
-uint32_t characteristic_value = 0x0;
-
 // Set up the advertisement data.
 #define DEVICE_NAME "group2"
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
@@ -148,18 +146,6 @@ static void bt_ready(int err)
     }
 
     printk("Advertising successfully started\n");
-
-    // for (size_t i = 0; i < ARRAY_SIZE(ad); i++) {
-    //     switch (ad[i].type) {
-    //         case BT_DATA_NAME_SHORTENED:
-    //             printk("Number (shortened): %.*s\n", ad[i].data_len, ad[i].data);
-    //             break;
-    //         case BT_DATA_NAME_COMPLETE:
-    //             printk("Number (complete): %.*s\n", ad[i].data_len, ad[i].data);
-    //             printk(ad[i].data);
-    //             break;
-    //     }
-    // }
 }
 
 /* Function to generate a random number */
@@ -235,30 +221,6 @@ static int welcome_msg_encode(uint8_t *buffer, uint32_t *len, int randomNumber)
     return err;
 	
 }
-
-// static int welcome_msg_encode(uint8_t *buffer, uint32_t *len, int randomNumber)
-// {
-//     int err;
-
-//     snprintf(en_payload, sizeof(en_payload), "%d", randomNumber);
-//     NFC_NDEF_TEXT_RECORD_DESC_DEF(nfc_en_text_rec, UTF_8, en_code, sizeof(en_code), en_payload, sizeof(en_payload));
-//     NFC_NDEF_MSG_DEF(nfc_text_msg, MAX_REC_COUNT);
-
-//     err = nfc_ndef_msg_record_add(&NFC_NDEF_MSG(nfc_text_msg), &NFC_NDEF_TEXT_RECORD_DESC(nfc_en_text_rec));
-//     if (err < 0) {
-//         printk("Failed to add text record: %d\n", err);
-//         return err;
-//     }
-
-//     err = nfc_ndef_msg_encode(&NFC_NDEF_MSG(nfc_text_msg), buffer, len);
-//     if (err < 0) {
-//         printk("Failed to encode NDEF message: %d\n", err);
-//         return err;
-//     }
-//     printk("NDEF message encoded successfully\n");
-//     return 0;
-// }
-
 
 /**
  * @brief Callback function for handling NFC events.
@@ -366,18 +328,20 @@ int main(void)
 
     int new_err;
 
+    uint32_t len = sizeof(new_ndef_msg_buf);
+
+	if (welcome_msg_encode(new_ndef_msg_buf, &len, randomNumber) < 0) {
+        printk("Cannot encode message!\n");
+        goto fail;
+    }
+
     new_err = bt_enable(bt_ready);
     if (new_err) {
         printk("Bluetooth init failed (err %d)\n", new_err);
         return;
     }
 
-	uint32_t len = sizeof(new_ndef_msg_buf);
-
-	if (welcome_msg_encode(new_ndef_msg_buf, &len, randomNumber) < 0) {
-        printk("Cannot encode message!\n");
-        goto fail;
-    }
+	
 
 	/* Run Read-Write mode for Type 4 Tag platform */
 	if (nfc_t4t_ndef_rwpayload_set(ndef_msg_buf,
@@ -392,23 +356,7 @@ int main(void)
 	}
 
 	
-	printk("Starting NFC Writable NDEF Message example\n");
-
-	// printk("testing!");
-
-		//move this somewhere to get it to show up
-	// srand(k_cycle_get_32());
-
-    // /* Generate random number */
-    // randomNumber = generateRandomNumber();
-
-    // int new_err;
-
-    // new_err = bt_enable(bt_ready);
-    // if (new_err) {
-    //     printk("Bluetooth init failed (err %d)\n", new_err);
-    //     return;
-    // }
+	// printk("Starting NFC Writable NDEF Message example\n");
 
 	// uint32_t len = sizeof(ndef_msg_buf);
 
@@ -420,6 +368,7 @@ int main(void)
 	// printk("after welcome msg encode");
 
 	while (true) {
+        printk("in while loop");
 		if (atomic_cas(&op_flags, FLASH_BUF_PREP_FINISHED,
 				FLASH_WRITE_STARTED)) {
 					
