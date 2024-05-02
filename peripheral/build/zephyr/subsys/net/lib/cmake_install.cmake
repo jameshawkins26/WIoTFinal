@@ -39,6 +39,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/alexismann/Desktop/iot/cli_1/writable_ndef_msg_2/build/zephyr/subsys/net/lib/utils/cmake_install.cmake")
+  include("/Users/alexismann/Desktop/iot/cli_1/record_text_1/build/zephyr/subsys/net/lib/utils/cmake_install.cmake")
 endif()
 
