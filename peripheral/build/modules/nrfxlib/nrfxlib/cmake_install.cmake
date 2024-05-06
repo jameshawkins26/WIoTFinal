@@ -39,21 +39,21 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/alexismann/Desktop/iot/cli_1/record_text_1/build/modules/nrfxlib/nrfxlib/nfc/cmake_install.cmake")
+  include("/Users/alexismann/Desktop/iot/WIoTFinal/peripheral/build/modules/nrfxlib/nrfxlib/nfc/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/alexismann/Desktop/iot/cli_1/record_text_1/build/modules/nrfxlib/nrfxlib/crypto/cmake_install.cmake")
+  include("/Users/alexismann/Desktop/iot/WIoTFinal/peripheral/build/modules/nrfxlib/nrfxlib/crypto/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/alexismann/Desktop/iot/cli_1/record_text_1/build/modules/nrfxlib/nrfxlib/softdevice_controller/cmake_install.cmake")
+  include("/Users/alexismann/Desktop/iot/WIoTFinal/peripheral/build/modules/nrfxlib/nrfxlib/softdevice_controller/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/alexismann/Desktop/iot/cli_1/record_text_1/build/modules/nrfxlib/nrfxlib/mpsl/cmake_install.cmake")
+  include("/Users/alexismann/Desktop/iot/WIoTFinal/peripheral/build/modules/nrfxlib/nrfxlib/mpsl/cmake_install.cmake")
 endif()
 

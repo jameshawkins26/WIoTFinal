@@ -222,8 +222,8 @@ static int uri_msg_encode(uint8_t *buffer, uint32_t *len)
    /* Create NFC NDEF URI record description for Google */
 	NFC_NDEF_URI_RECORD_DESC_DEF(nfc_uri_google_rec,
                               NFC_URI_HTTPS,
-                              "cs.virginia.edu/~jrh4az/wiotfinal.html",
-                              sizeof("cs.virginia.edu/~jrh4az/wiotfinal.html"));
+                              "www.cs.virginia.edu/~jrh4az/wiotfinal.html",
+                              sizeof("www.cs.virginia.edu/~jrh4az/wiotfinal.html"));
 
 
     /* Create NFC NDEF message description, capacity - MAX_REC_COUNT
@@ -348,5 +348,3 @@ fail:
 
     return -EIO;
 }
-
-

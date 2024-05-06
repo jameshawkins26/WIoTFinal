@@ -842,7 +842,7 @@ rule C_STATIC_LIBRARY_LINKER__kernel_
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /opt/nordic/ncs/toolchains/20d68df7e5/Cellar/cmake/3.20.5/bin/cmake --regenerate-during-build -S/Users/alexismann/Desktop/iot/cli_1/record_text_1 -B/Users/alexismann/Desktop/iot/cli_1/record_text_1/build
+  command = /opt/nordic/ncs/toolchains/20d68df7e5/Cellar/cmake/3.20.5/bin/cmake --regenerate-during-build -S/Users/alexismann/Desktop/iot/WIoTFinal/peripheral -B/Users/alexismann/Desktop/iot/WIoTFinal/peripheral/build
   description = Re-running CMake...
   generator = 1
 
