@@ -17,14 +17,58 @@
 
 #define SEARCH_UUID BT_UUID_128_ENCODE(0xBDFC9792, 0x8234, 0x405E, 0xAE02, 0x35EF4174B299)
 
+// Max number of coasters
+#define MAX_COASTERS 20
+
+struct random_number_node {
+	int random_number;
+};
+
+// List of coasters received
+struct random_number_node random_numbers[MAX_COASTERS];
+int num_random_numbers = 0;
+
+// Print list of coasters
+void print_random_numbers() {
+    printk("Random numbers: ");
+    for (int i = 0; i < num_random_numbers; i++) {
+        printk("%d ", random_numbers[i].random_number);
+    }
+    printk("\n");
+}
+
+// Add coaster received to list
+void add_random_number(int number) {
+    if (num_random_numbers < MAX_COASTERS) {
+        // Check if the number already exists in the list
+        int exists = 0;
+        for (int i = 0; i < num_random_numbers; i++) {
+            if (random_numbers[i].random_number == number) {
+                exists = 1;
+                break;
+            }
+        }
+        if (!exists) {
+            // Number does not exist
+            random_numbers[num_random_numbers].random_number = number;
+            num_random_numbers++;
+            printk("Added random number: %d\n", number);
+            print_random_numbers();
+        } else {
+            printk("Random number %d already exists in the list\n", number);
+        }
+    } else {
+        printk("Maximum number of coasters reached\n");
+    }
+}
+
+
 
 static void start_scan(void);
 
 static struct bt_conn *default_conn;
 
 static struct bt_gatt_discover_params discover_params;
-
-
 
 struct discovered_gatt_descriptor {
 	uint16_t handle;
@@ -68,13 +112,6 @@ static void notification_received_cb(struct bt_conn *conn,
                                      struct bt_gatt_subscribe_params *params,
                                      const void *data, uint16_t length)
 {
-    for (int i = 0; i < num_subscriptions; i++) {
-        if (&subscribe_params[i] == params) {
-            // Found correct subscription
-            //printk("Notification received on value handle: 0x%04x, CCC handle: 0x%04x, Data length: %d\n", 
-                   params->value_handle, params->ccc_handle, length;
-        }
-    }
 
     // Find the characteristic UUID
     uint16_t value_handle = params->value_handle;
@@ -87,21 +124,9 @@ static void notification_received_cb(struct bt_conn *conn,
             }
         }
     }
-
-    if (char_uuid_str) {
-        //printk("Notification received for characteristic with UUID: %s\n", char_uuid_str);
-    } else {
-        //printk("Notification received for unknown characteristic (handle: 0x%04x)\n", value_handle);
-    }
-
-    //printk("Notification: data length %u\n", length);
 	// Process the data received from notification
     const uint8_t *data_bytes = data;
-    //printk("Notification Data: ");
-    for (uint16_t i = 0; i < length; i++) {
-        //printk("%02x ", data_bytes[i]);
-    }
-    //printk("\n");
+
 	return BT_GATT_ITER_CONTINUE;
 
 }
@@ -155,8 +180,6 @@ void enable_notifications_for_all_characteristics(struct bt_conn *conn) {
         }
     }
 }
-
-          
 
 static uint8_t discover_func(struct bt_conn *conn,
 			                 const struct bt_gatt_attr *attr,
@@ -230,20 +253,14 @@ static uint8_t discover_func(struct bt_conn *conn,
 				int s, c, d;
 				for (s=0; s<num_discovered_services; s++) {
 					struct discovered_gatt_service* disc_serv = &services[s];
-
 					bt_uuid_to_str((struct bt_uuid*) &disc_serv->uuid, str, 128);
-					//printk("\nService [%s] - handle: 0x%02x\n", str, disc_serv->handle);
-
 					for (c=0; c<disc_serv->num_characteristics; c++) {
 						struct discovered_gatt_characteristic* disc_char = &disc_serv->characteristics[c];
-
 						bt_uuid_to_str((struct bt_uuid*) &disc_char->uuid, str, 128);
 						//printk("  -Characteristic [%s] - handle: 0x%02x\n", str, disc_char->handle);
 						//printk("  ---Value handle: 0x%02x\n", disc_char->value_handle);
-
 						for (d=0; d<disc_char->num_descriptors; d++) {
 							struct discovered_gatt_descriptor* disc_desc = &disc_char->descriptors[d];
-
 							if (bt_uuid_cmp((struct bt_uuid*) &disc_desc->uuid, BT_UUID_GATT_CCC) == 0) {
 								//printk("  ---CCC - handle: 0x%02x\n", disc_desc->handle);
 							} else {
@@ -378,8 +395,6 @@ static bool ad_found(struct bt_data *data, void *user_data)
 {
 	bt_addr_le_t *addr = user_data;
 
-	//printk("[AD]: %u data_len %u\n", data->type, data->data_len);
-
 	switch (data->type) {
 	case BT_DATA_UUID128_ALL:
 		if (data->data_len != 16) {
@@ -416,9 +431,40 @@ static bool ad_found(struct bt_data *data, void *user_data)
 
 		return false;
 	case BT_DATA_NAME_COMPLETE:
-        printk("Random number: %.*s\n", data->data_len, data->data);
-        return false;
-	}
+
+		// Check if received data is a number
+		bool is_number = true;
+		for (int i = 0; i < data->data_len; i++) {
+			if (!isdigit(data->data[i])) {
+				is_number = false;
+				break;
+			}
+		}
+		if (is_number) {
+			// Convert received data to integer
+			printk("Received data: %.*s\n", data->data_len, data->data);
+			int random_number = atoi(data->data);
+
+			// Print the received random number
+			//printk("Converted random number: %d\n", random_number);
+
+			// Add random number to the list
+			add_random_number(random_number);
+
+			// Print the list of random numbers for debugging
+			// printk("Current list of random numbers:\n");
+			// for (int i = 0; i < num_random_numbers; i++) {
+			// 	printk("%d\n", random_numbers[i].random_number);
+			// }
+
+			// Print random numbers
+			print_random_numbers();
+		} else {
+			printk("Received data is not a number\n");
+		}
+
+		return false;
+		}
 
 	return true;
 }
@@ -429,15 +475,11 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 	char dev[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(addr, dev, sizeof(dev));
-	//printk("[DEVICE]: %s, AD evt type %u, AD data len %u, RSSI %i\n",
-	      // dev, type, ad->len, rssi);
 
-	// We're only interested in connectable devices.
+	// Connectable devices.
 	if (type == BT_GAP_ADV_TYPE_ADV_IND ||
 	    type == BT_GAP_ADV_TYPE_ADV_DIRECT_IND) {
-		// Helper function to parse the advertising data (AD) elements
-		// from the advertisement. This will call `ad_found()` for
-		// each element.
+
 		bt_data_parse(ad, ad_found, (void*) addr);
 	}
 }
